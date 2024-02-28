@@ -46,9 +46,9 @@ class BBHRunner:
             }
         )
 
-    def flush(self, task):
+    def flush(self, task, accuracy=None):
         file_path = os.path.join(self.log_base_dir, f'{task}.json')
-        data = {'outputs': self.logs}
+        data = {'outputs': self.logs, 'accuracy': accuracy}
 
         # Write JSON data to file
         with open(file_path, 'w') as json_file:
@@ -58,12 +58,13 @@ class BBHRunner:
 
     def run_bbh_test(self):
         """Test the function of bbh runner or models, running part of the bench"""
-        score, total = 0, 0
+        total_score, total_missing, total_count = 0, 0, 0
         for task in self.tasks:
+            score, missing, count = 0, 0, 0
             template, questions = self.load_data(task)
 
             for i, question in enumerate(questions[0: 1]):
-                total += 1
+                count += 1
                 prompt = template.get_prompt(question['input'])
                 output = self.model(prompt)
 
@@ -77,6 +78,7 @@ class BBHRunner:
                 answer = extract_answer(output)
                 if answer is None:
                     print('No answer found')
+                    missing += 1
                 elif answer == question['target']:
                     print(f'Extracted answer "{answer}": Hit.')
                     score += 1
@@ -86,10 +88,13 @@ class BBHRunner:
                 # Log the model output
                 self.log_output(prompt, output, answer, question['target'])
 
-            self.flush(task)
+            self.flush(task, accuracy=score/count)
+            total_score += score
+            total_missing += missing
+            total_count += count
 
-
-        print(f'Total score: {score}/{total}')
+        print(f'Total score: {total_score}/{total_count}')
+        print(f'Missing outputs: {total_missing}/{total_count}')
 
     def run_bbh(self):
         """Run the whole bbh bench"""
