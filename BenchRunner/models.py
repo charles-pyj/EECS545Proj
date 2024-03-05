@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import OPTForCausalLM, GPT2Tokenizer
+from transformers import OPTForCausalLM, GPT2Tokenizer, AutoModelForSeq2SeqLM, AutoTokenizer
 from openai import OpenAI
 
 # You can replace with your api key
@@ -38,6 +38,21 @@ class OPTModel(nn.Module):
         answers = generated_text.split('\n\n', 1)
         return answers[0] if len(answers) > 1 else generated_text
 
+class T5Model(nn.Module):
+    def __init__(self, model_version):
+        super().__init__()
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_version)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_version)
+    
+    def __call__(self, prompt, max_tokens=500):
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(device=self.model.device)
+        model_max_len = self.model.config.max_position_embeddings
+        chunk_size = 100  # Tokens to generate each iteration
+        outputs = self.model.generate(**inputs, 
+                                      max_new_tokens=max_tokens,
+                                      do_sample=False)
+        generated_text = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+        return generated_text
 
 class ChatGPTModel:
     def __init__(self, model_version):
