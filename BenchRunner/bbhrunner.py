@@ -1,7 +1,7 @@
 import os
 import json
-from template import FewShotTemplate
-from utils import *
+from BenchRunner.template import FewShotTemplate
+from BenchRunner.utils import *
 
 full_tasks = ['boolean_expressions', 'causal_judgement', 'date_understanding', 'disambiguation_qa',
               'dyck_languages', 'formal_fallacies', 'geometric_shapes', 'hyperbaton',

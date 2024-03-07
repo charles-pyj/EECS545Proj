@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
-from transformers import OPTForCausalLM, GPT2Tokenizer, AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import OPTForCausalLM, GPT2Tokenizer, AutoModelForSeq2SeqLM, AutoTokenizer, AutoModelForCausalLM
+from typing import Literal, List
 from openai import OpenAI
+from huggingface_hub import login
 
 # You can replace with your api key
 API_KEY = "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"
@@ -69,3 +71,49 @@ class ChatGPTModel:
 
         output = response.choices[0].message.content
         return output
+
+class GemmaInstructModel:
+    def __init__(self, model_version: Literal["google/gemma-2b-it", "google/gemma-7b-it"], device: torch.device='cpu') -> None:
+        # login to hf
+        login('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')
+        
+        self.model = AutoModelForCausalLM.from_pretrained(model_version).to(device)
+        self.model.eval()
+        self.tokenizer = AutoTokenizer.from_pretrained(model_version)
+        self.chat = []
+    
+    def __call__(self, prompt: str, max_tokens: int=1000) -> List[str]:
+        self.chat.append({
+            "role": "user",
+            "content": prompt
+        })
+        templated_prompt = self.tokenizer.apply_chat_template(self.chat, tokenize=False, add_generation_prompt=True)
+        print(templated_prompt)
+        inputs = self.tokenizer.encode(templated_prompt, add_special_tokens=False, return_tensors='pt')
+
+        with torch.inference_mode():
+            outputs = self.model.generate(input_ids=inputs.to(self.model.device), max_new_tokens=max_tokens)
+       
+        decoded_output = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+
+        return decoded_output
+
+class GemmaModel:
+    def __init__(self, model_version: Literal["google/gemma-2b", "google/gemma-7b"], device: torch.device='cpu') -> None:
+        # login to hf
+        login('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')
+        
+        self.model = AutoModelForCausalLM.from_pretrained(model_version).to(device)
+        self.model.eval()
+        self.tokenizer = AutoTokenizer.from_pretrained(model_version)
+
+    def __call__(self, prompt: str, max_tokens: int=1000) -> torch.Any:
+        inputs = self.tokenizer.encode(prompt, add_special_tokens=False, return_tensors='pt')
+        
+        with torch.inference_mode():
+            # need to tune this, generate things badly now.
+            outputs = self.model.generate(input_ids=inputs.to(self.model.device), max_new_tokens=max_tokens)
+        
+        decoded_output = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+        
+        return decoded_output
