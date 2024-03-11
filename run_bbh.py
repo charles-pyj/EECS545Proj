@@ -9,5 +9,14 @@ model = ChatGPTModel('gpt-3.5-turbo')
 bbh = BBHRunner(model,
                 './bbh',
                 './cot-prompts',
-                './gpt-3.5-turbo-partial-outputs')
+                './gpt-3.5-turbo-partial-outputs',
+                )
+bbh.run_bbh_test()
+
+# An example of using direct answer prompt.
+bbh = BBHRunner(model,
+                './bbh',
+                './cot-prompts',
+                './gpt-3.5-turbo-partial-outputs',
+                mode='direct')
 bbh.run_bbh_test()
