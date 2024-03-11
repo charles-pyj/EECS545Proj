@@ -1,7 +1,7 @@
 import os
 import json
-from BenchRunner.template import FewShotTemplate
-from BenchRunner.utils import *
+from template import FewShotTemplate
+from utils import *
 
 full_tasks = ['boolean_expressions', 'causal_judgement', 'date_understanding', 'disambiguation_qa',
               'dyck_languages', 'formal_fallacies', 'geometric_shapes', 'hyperbaton',
@@ -14,10 +14,11 @@ full_tasks = ['boolean_expressions', 'causal_judgement', 'date_understanding', '
 
 
 class BBHRunner:
-    def __init__(self, model, data_base_dir, prompt_base_dir, log_base_dir, tasks=None):
+    def __init__(self, model, data_base_dir, prompt_base_dir, log_base_dir, mode='cot', tasks=None):
         self.model = model
         self.data_base_dir = data_base_dir
         self.prompt_base_dir = prompt_base_dir
+        self.mode = mode
 
         if tasks is None:
             tasks = full_tasks
@@ -30,7 +31,7 @@ class BBHRunner:
 
     def load_data(self, task):
         """Load input questions and prompts from corresponding directories"""
-        template = FewShotTemplate(task, self.prompt_base_dir)
+        template = FewShotTemplate(task, self.prompt_base_dir, self.mode)
         with open(os.path.join(self.data_base_dir, f'{task}.json'), encoding="utf8") as file:
             questions = json.load(file)['examples']
 
@@ -98,19 +99,43 @@ class BBHRunner:
 
     def run_bbh(self):
         """Run the whole bbh bench"""
+        total_score, total_missing, total_count = 0, 0, 0
         for task in self.tasks:
+            score, missing, count = 0, 0, 0
             template, questions = self.load_data(task)
 
             for i, question in enumerate(questions):
+                count += 1
                 prompt = template.get_prompt(question['input'])
-                answer = self.model(prompt)
+                output = self.model(prompt)
 
                 print('-' * 25, f'{task} Question {i}', '-' * 25)
                 print(question['input'])
                 print('*' * 15, 'Model Output', '*' * 15)
-                print(answer)
+                print(output)
                 print('*' * 15, 'Correct Answer', '*' * 15)
-                print(question['target'])
+                print(f'Correct answer "{question["target"]}"')
+
+                answer = extract_answer(output)
+                if answer is None:
+                    print('No answer found')
+                    missing += 1
+                elif answer == question['target']:
+                    print(f'Extracted answer "{answer}": Hit.')
+                    score += 1
+                else:
+                    print(f'Extracted answer "{answer}": Miss.')
+
+                # Log the model output
+                self.log_output(prompt, output, answer, question['target'])
+
+            self.flush(task, accuracy=score / count)
+            total_score += score
+            total_missing += missing
+            total_count += count
+
+        print(f'Total score: {total_score}/{total_count}')
+        print(f'Missing outputs: {total_missing}/{total_count}')
 
 
 

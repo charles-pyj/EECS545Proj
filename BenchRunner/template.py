@@ -1,8 +1,9 @@
 import os
+from utils import *
 
 
 class FewShotTemplate:
-    def __init__(self, task_name, prompt_dir):
+    def __init__(self, task_name, prompt_dir, mode):
         """Load and parse prefixes and fewshot examples"""
         example_path = os.path.join(prompt_dir, f'{task_name}.txt')
         with open(example_path, encoding="utf8") as file:
@@ -20,7 +21,12 @@ class FewShotTemplate:
             question, answer = example.split('\nA: ', 1)
 
             question = question.replace('Q: ', '')
-            answer = answer.replace('A: ', '')
+            if mode == 'cot':
+                answer = answer.replace('A: ', '')
+            elif mode == 'direct':
+                answer = extract_answer(answer)
+            else:
+                raise NotImplementedError()
             self.examples.append({'question': question, 'answer': answer})
 
     def get_examples(self):
