@@ -1,5 +1,5 @@
 import os
-from utils import *
+from BenchRunner.utils import *
 
 
 class FewShotTemplate:
@@ -17,6 +17,7 @@ class FewShotTemplate:
 
         # The examples in the form of a list of dicts
         self.examples = []
+        self.mode = mode
         for example in content[-3:]:
             question, answer = example.split('\nA: ', 1)
 
@@ -41,9 +42,13 @@ class FewShotTemplate:
     def get_prefix(self):
         return self.prefix
 
-    @staticmethod
-    def get_suffix():
-        return "Q: {question}\nA: Let's think step by step."
+    def get_suffix(self):
+        if self.mode == 'cot':
+            return "Q: {question}\nA: Let's think step by step."
+        elif self.mode == 'direct':
+            return "Q: {question}\nA: "
+        else:
+            raise NotImplementedError()
 
     def get_prompt(self, text):
         prompt_template = self.prefix + '\n' * 2
