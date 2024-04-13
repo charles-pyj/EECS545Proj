@@ -11,4 +11,4 @@ CUDA_VISIBLE_DEVICES="2,3,4" accelerate launch \
     --source_prefix "generate: " \
     --num_beams 4 \
     --output_dir /shared/3/projects/spatial-understanding/checkpoints_1109 \
-    --checkpointing_steps=400 \
+    --checkpointing_steps=10000 \

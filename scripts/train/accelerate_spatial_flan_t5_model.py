@@ -142,7 +142,7 @@ def parse_args():
     parser.add_argument(
         "--max_target_length",
         type=int,
-        default=128,
+        default=1024,
         help=(
             "The maximum total sequence length for target text after "
             "tokenization. Sequences longer than this will be truncated, sequences shorter will be padded."
