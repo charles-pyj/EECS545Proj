@@ -51,8 +51,9 @@ def verify_predictions(data):
             else:
                 print("Invalid input. Only 'q', 'e', 'b', or '\\' are accepted. Please try again.")
         index += 1
+    correct_indices.sort()
 
-    return correct_indices.sort(), len(data)
+    return correct_indices, len(data)
 
 def calculate_accuracy(correct_indices, total_count):
     correct_count = len(correct_indices)
