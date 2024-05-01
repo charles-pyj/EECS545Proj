@@ -1,3 +1,5 @@
+"""A script to test the funtionality of the bbh"""
+
 from BenchRunner.models import GemmaModel, GemmaInstructModel
 from BenchRunner.bbhrunner import BBHRunner
 

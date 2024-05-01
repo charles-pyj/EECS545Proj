@@ -1,3 +1,5 @@
+"""A script to test the funtionality of the bbh"""
+
 from BenchRunner.bbhrunner import BBHRunner
 from BenchRunner.models import ChatGPTModel, OPTModel
 
