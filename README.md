@@ -19,7 +19,7 @@ We also provide all the existing results in JSON format in `./results` folder. T
 ## Data augmentation
 Run `data_augmentation.py` by plugging in your openai API key.
 
-## Fintune T5 and OPT models
+## Fine-tuning T5 and OPT models
 We implemented the fine-tuning process with huggingface accelerator🤗. Run the finetuning code with 
 ```
 bash train_spatial_flan_t5_model.sh
