@@ -6,7 +6,7 @@ from openai import OpenAI
 from huggingface_hub import login
 
 # You can replace with your api key
-API_KEY = "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"
+API_KEY = "your-api-key"
 
 
 class OPTModel(nn.Module):
