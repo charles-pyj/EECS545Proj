@@ -19,5 +19,11 @@ We also provide all the existing results in JSON format in `./results` folder. T
 ## Data augmentation
 
 ## Fintune T5 and OPT models
+We implemented the fine-tuning process with huggingface accelerator🤗. Run the finetuning code with 
+```
+bash train_spatial_flan_t5_model.sh
+```
+Make sure you have the `.csv` data in your designated folder. The data should have two columns `question` and `answer` in the default setting.
+You may want to switch to your own configurations for fine-tuning.
 
 ## DPO
