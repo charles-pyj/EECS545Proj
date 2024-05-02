@@ -3,11 +3,11 @@ CUDA_VISIBLE_DEVICES="0,1" accelerate launch \
     --num_processes=2 \
     accelerate_spatial_causal_model.py \
     --model_name_or_path "facebook/opt-350m" \
-    --train_file /shared/3/projects/spatial-understanding/sushrita-run-scripts/formatted_directions_train_detailed.csv \
-    --validation_file /shared/3/projects/spatial-understanding/sushrita-run-scripts/formatted_directions_dev_detailed.csv \
+    --train_file ./data/train.csv \
+    --validation_file ./data/val.csv \
     --text_column question \
     --summary_column answer \
-    --output_dir /shared/3/projects/spatial-understanding/osrm-opt-out \
+    --output_dir ./out \
     --overwrite_output_dir \
     --per_device_train_batch_size 2 \
     --per_device_eval_batch_size 2 \
