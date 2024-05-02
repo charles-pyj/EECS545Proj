@@ -28,3 +28,4 @@ Make sure you have the `.csv` data in your designated folder. The data should ha
 You may want to switch to your own configurations for fine-tuning.
 
 ## DPO
+Please see `direct-preference-optimization`
