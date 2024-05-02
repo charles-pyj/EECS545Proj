@@ -3,7 +3,7 @@ Course Project for EECS545
 
 ## Evaluation on BBH
 
-You can run the full evaluation by directly running our provided script.
+The bench is availabe at [BIG-Bench-Hard](https://github.com/suzgunmirac/BIG-Bench-Hard). You can run the full evaluation by directly running our provided script after retrieving `bbh` and `cot-prompts` folders.
 ```python
 python run_bbh.py
 ```
